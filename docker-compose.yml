@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+  # Main API service
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./models:/app/models
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - esg-network
+    restart: unless-stopped
+
+  # Streamlit dashboard
+  dashboard:
+    build: .
+    command: streamlit run src/dashboard/app.py --server.address 0.0.0.0 --server.port 8501
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+      - ./data:/app/data
+    env_file:
+      - .env
+    depends_on:
+      - api
+    networks:
+      - esg-network
+    restart: unless-stopped
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: esg_sentiment_db
+      POSTGRES_USER: esg_user
+      POSTGRES_PASSWORD: esg_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - esg-network
+    restart: unless-stopped
+
+  # Redis cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - esg-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # Pinecone alternative: ChromaDB
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:latest
+    ports:
+      - "8001:8000"
+    volumes:
+      - chromadb_data:/chroma/chroma
+    networks:
+      - esg-network
+    restart: unless-stopped
+    environment:
+      - CHROMA_SERVER_HOST=0.0.0.0
+      - CHROMA_SERVER_HTTP_PORT=8000
+
+  # Jupyter for analysis and development
+  jupyter:
+    build: .
+    command: jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/app/notebooks
+      - ./src:/app/src
+      - ./config:/app/config
+      - ./data:/app/data
+    env_file:
+      - .env
+    networks:
+      - esg-network
+    restart: unless-stopped
+
+  # News scraper service (can be run as a scheduled job)
+  scraper:
+    build: .
+    command: python -m src.scraping.news_scraper
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+      - ./data:/app/data
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - esg-network
+    restart: "no"  # Run as needed, not continuously
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  chromadb_data:
+    driver: local
+
+networks:
+  esg-network:
+    driver: bridge
