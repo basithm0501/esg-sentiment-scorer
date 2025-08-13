@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "postgresql://username:password@localhost:5432/esg_sentiment_db"
     redis_url: str = "redis://localhost:6379"
+    esg_db_password: str = "esg_password"
     
     # Application
     environment: str = "development"

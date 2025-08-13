@@ -53,12 +53,16 @@ class MultilingualScraper:
                         link = base_url.rstrip("/") + "/" + link.lstrip("/")
                     article_html = self.fetch_article(link)
                     if article_html:
+                        soup_article = BeautifulSoup(article_html, "html.parser")
+                        title_tag = soup_article.find("title")
+                        title = title_tag.get_text(strip=True) if title_tag else None
                         raw_text = self.clean_text(article_html)
                         translated_text = self.translate_text(raw_text, lang)
                         results.append({
                             "company": company_name,
                             "source": source["name"],
                             "language": lang,
+                            "title": title,
                             "raw_text": raw_text,
                             "translated_text": translated_text,
                             "url": link
@@ -93,8 +97,14 @@ class MultilingualScraper:
         """Translate text to English if not already English"""
         if src_lang == "en" or not GoogleTranslator:
             return text
+        # Truncate to 5000 characters for translation API
+        max_len = 5000
+        text = text[:max_len]
+        # Map unsupported language codes to supported ones
+        lang_map = {"zh": "zh-CN"}
+        src_lang_mapped = lang_map.get(src_lang, src_lang)
         try:
-            translated = GoogleTranslator(source=src_lang, target="en").translate(text)
+            translated = GoogleTranslator(source=src_lang_mapped, target="en").translate(text)
             return translated
         except Exception as e:
             logger.error(f"Translation error: {e}")
@@ -113,12 +123,16 @@ class MultilingualScraper:
             article_url = source.get("base_url")
             html = self.fetch_article(article_url)
             if html:
+                soup_article = BeautifulSoup(html, "html.parser")
+                title_tag = soup_article.find("title")
+                title = title_tag.get_text(strip=True) if title_tag else None
                 raw_text = self.clean_text(html)
                 translated_text = self.translate_text(raw_text, lang)
                 results.append({
                     "company": company["name"],
                     "source": source["name"],
                     "language": lang,
+                    "title": title,
                     "raw_text": raw_text,
                     "translated_text": translated_text,
                     "url": article_url
@@ -133,6 +147,7 @@ if __name__ == "__main__":
     from config.companies import COMPANIES
     logging.basicConfig(level=logging.INFO)
     scraper = MultilingualScraper(NewsSource.SOURCES, Settings().SUPPORTED_LANGUAGES)
+    from src.db.article_store import store_article
     for company in COMPANIES[:3]:
         articles = scraper.scrape_company_news(company)
         for article in articles:
@@ -140,3 +155,5 @@ if __name__ == "__main__":
             print(f"Raw: {article['raw_text'][:100]}")
             print(f"Translated: {article['translated_text'][:100]}")
             print()
+            store_article(article)
+            print("Article stored in database.")
