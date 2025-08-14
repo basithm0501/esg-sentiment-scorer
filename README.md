@@ -21,10 +21,19 @@
 - Environmental, Social, and Governance factor detection
 - Context-aware analysis using transformer models
 
-### 📊 Intelligent Scoring Engine
+
+### 📊 Intelligent Scoring & Risk Engine
 - Company ranking by ESG risk profile
 - Weighted scoring across multiple ESG dimensions
+- ESG scores normalized to 0–100 risk scale for investors
+- CSV output for scores and risk metrics
 - Historical trend analysis and prediction
+
+### 📈 Investment Dashboard & Visualization
+- Streamlit dashboard for ESG risk heatmaps by sector & region
+- Interactive filtering by sector and region
+- Real-time ESG score and risk updates
+- Investment recommendation insights
 
 ### 📈 Investment Dashboard
 - Interactive risk visualization
@@ -34,25 +43,17 @@
 
 ## 🔧 Technology Stack
 
-### Backend & APIs
-- **Python** - Core application framework
-- **FastAPI** - High-performance API development
-- **BeautifulSoup/Scrapy** - Web scraping and data extraction
-
-### AI & Machine Learning
-- **HuggingFace Transformers** - Pre-trained language models
-- **LangChain** - LLM application framework
-- **OpenAI/Mistral APIs** - Advanced language processing
-
-### Data Storage & Vectors
-- **Pinecone/ChromaDB** - Vector database for embeddings
-- **PostgreSQL** - Structured data storage
-- **Redis** - Caching and session management
-
-### Frontend & Visualization
-- **Streamlit** - Interactive dashboard framework
-- **Plotly** - Advanced data visualization
+### Core Stack
+- **Python** - Main language for all modules
+- **BeautifulSoup** - Web scraping and HTML parsing
+- **Requests** - HTTP requests for scraping
+- **SQLAlchemy** - Database ORM for PostgreSQL
+- **PostgreSQL** - Relational database for articles and companies
 - **Pandas** - Data manipulation and analysis
+- **NumPy** - Numerical operations
+- **Matplotlib/Seaborn/Plotly** - Data visualization
+- **Streamlit** - Interactive dashboard
+- **HuggingFace Transformers** - BERT-based ESG sentiment classification
 
 ## 📁 Project Structure
 
@@ -68,91 +69,30 @@ esg-sentiment-scorer/
 │   ├── raw/             # Raw scraped data
 │   ├── processed/       # Cleaned and processed data
 │   └── vectors/         # Vector embeddings
-├── models/              # Trained models and checkpoints
 ├── config/              # Configuration files
-├── tests/               # Unit and integration tests
-├── docs/                # Documentation
-└── notebooks/           # Jupyter analysis notebooks
+├── tests/               # Unit and integration tests [TODO]
+└── docs/                # Documentation
 ```
 
-## 🚀 Getting Started
 
-### Prerequisites
-- Python 3.9+
-- Node.js (for any frontend components)
-- Docker (optional, for containerization)
+## 🚀 Getting Started & Usage
 
-### Installation
+See `docs/USAGE.md` for all setup, usage, and troubleshooting instructions.
 
-1. **Clone and setup environment**
-```bash
-cd esg-sentiment-scorer
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
+## 📈 Roadmap & Next Steps
 
-2. **Set up environment variables**
-```bash
-cp .env.example .env
-# Edit .env with your API keys and configuration
-```
+- [x] Multilingual news scraping with fuzzy/keyword matching
+- [x] ESG scoring pipeline with BERT classifier
+- [x] Normalized ESG risk scores (0–100 scale)
+- [x] Streamlit dashboard for ESG risk heatmaps by sector & region
+- [x] Usage guide in `docs/USAGE.md`
+- [x] CSV output for scores and risk metrics
+- [x] Improved error handling, translation, and logging
 
-3. **Initialize database and vector store**
-```bash
-python src/setup_database.py
-```
-
-4. **Run the application**
-```bash
-# Start API server
-uvicorn src.api.main:app --reload
-
-# Start dashboard (in another terminal)
-streamlit run src/dashboard/app.py
-```
-
-## 🔑 API Keys Required
-
-- **OpenAI API Key** (or Mistral AI)
-- **News API Keys** (NewsAPI, Alpha Vantage, etc.)
-- **Pinecone API Key** (if using Pinecone for vectors)
-
-## 📊 ESG Categories Analyzed
-
-### Environmental (E)
-- Climate change and carbon emissions
-- Resource usage and waste management
-- Renewable energy adoption
-- Environmental compliance
-
-### Social (S)
-- Labor practices and human rights
-- Community relations
-- Product safety and quality
-- Diversity and inclusion
-
-### Governance (G)
-- Board composition and independence
-- Executive compensation
-- Anti-corruption policies
-- Shareholder rights
-
-## 🎯 Target Use Cases
-
-- **Investment Firms** - ESG risk assessment for portfolio management
-- **Hedge Funds** - Alternative data for investment decisions
-- **Corporate Teams** - ESG compliance monitoring
-- **Researchers** - ESG trend analysis and reporting
-
-## 📈 Roadmap
-
-- [ ] Phase 1: Basic news scraping and sentiment analysis
-- [ ] Phase 2: ESG classification and scoring engine
-- [ ] Phase 3: Interactive dashboard development
-- [ ] Phase 4: Multi-language support expansion
-- [ ] Phase 5: Real-time alerts and notifications
-- [ ] Phase 6: API monetization and enterprise features
+### Next Steps
+- Add more ESG/business news sources and data
+- Implement unit and integration tests
+- Automate data updates and dashboard refresh
 
 ## 🤝 Contributing
 
