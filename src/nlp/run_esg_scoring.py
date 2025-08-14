@@ -11,24 +11,34 @@ from src.nlp.esg_classifier import ESGClassifier, weak_label_esg, aggregate_esg_
 
 # Step 1: Fetch articles from DB
 
+
 def fetch_articles():
     session = SessionLocal()
-    articles = session.query(Article).all()
+    # Join Article with Company to get company name
+    from src.db.models import Company
+    articles = session.query(Article, Company).join(Company, Article.company_id == Company.id).all()
     session.close()
+    print(f"Fetched {len(articles)} articles from the database.")
+    if articles:
+        print("Sample article fields:")
+        sample = articles[0]
+        print(f"company: {getattr(sample[1], 'name', None)}")
+        print(f"title: {getattr(sample[0], 'title', None)}")
+        print(f"raw_text: {getattr(sample[0], 'raw_text', None)}")
+        print(f"translated_text: {getattr(sample[0], 'translated_text', None)}")
     return articles
 
 # Step 2: Prepare data for classifier
 
 def prepare_article_data(articles):
     data = []
-    for a in articles:
-        text = a.translated_text if a.translated_text else a.raw_text
+    for a, company in articles:
+        text = a.content
         if not text:
             continue
-        # Use weak labels for training, or dummy for inference
         weak_labels = weak_label_esg(text)
         data.append({
-            "company": a.company,
+            "company": company.name,
             "text": text,
             "environment": weak_labels["environment"],
             "social": weak_labels["social"],

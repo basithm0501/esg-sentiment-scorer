@@ -9,7 +9,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.sql import func
 from sqlalchemy import ForeignKey
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional
 
 import sys
@@ -27,7 +27,7 @@ class Company(Base):
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False)
-    ticker = Column(String(10))
+    ticker = Column(String(20))
     sector = Column(String(100))
     industry = Column(String(100))
     market_cap = Column(Integer)
@@ -251,26 +251,6 @@ def get_latest_esg_analysis(session, company_id: str) -> Optional[ESGSentimentAn
 
 # Usage example
 if __name__ == "__main__":
-    # Test the models
     db_manager = DatabaseManager()
-    
-    # Create session
-    session = db_manager.get_session()
-    
-    try:
-        # Test query
-        companies = session.query(Company).limit(5).all()
-        print(f"Found {len(companies)} companies:")
-        for company in companies:
-            print(f"  - {company.name} ({company.ticker})")
-        
-        # Test articles
-        articles = session.query(NewsArticle).limit(3).all()
-        print(f"\nFound {len(articles)} articles:")
-        for article in articles:
-            print(f"  - {article.title[:50]}... from {article.source}")
-            
-    finally:
-        session.close()
-    
-    print("✅ ORM models working correctly!")
+    db_manager.create_tables()
+    print("✅ Tables created (or already exist)!")

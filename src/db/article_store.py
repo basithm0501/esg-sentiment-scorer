@@ -22,15 +22,13 @@ Base = declarative_base()
 
 class Article(Base):
     __tablename__ = "news_articles"
-    id = Column(Integer, primary_key=True, index=True)
-    company = Column(String(128), index=True)
+    id = Column(String(36), primary_key=True, index=True)  # UUID as string for compatibility
+    company_id = Column(String(36), index=True)  # Foreign key to companies.id
     source = Column(String(128), index=True)
     language = Column(String(8), index=True)
     title = Column(Text, nullable=False)
-    raw_text = Column(Text)
-    translated_text = Column(Text)
+    content = Column(Text)
     url = Column(String(512))
-    timestamp = Column(DateTime, default=datetime.utcnow)
 
 # Create table if not exists
 Base.metadata.create_all(bind=engine)

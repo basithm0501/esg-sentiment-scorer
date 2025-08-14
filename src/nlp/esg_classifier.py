@@ -1,6 +1,9 @@
+
+# Import typing before any usage
+from typing import List, Dict
 # Training and inference pipeline
 from torch.utils.data import Dataset, DataLoader
-from transformers import AdamW
+from torch.optim import AdamW
 
 class ESGDataset(Dataset):
     def __init__(self, articles: List[Dict], tokenizer, max_length=256):
