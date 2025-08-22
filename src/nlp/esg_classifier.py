@@ -120,10 +120,34 @@ class ESGClassifier:
 # classifier = ESGClassifier(model_path="path_to_finetuned_model")
 # scores = classifier.predict("This company is investing in renewable energy and diversity.")
 # print(scores)  # {'environment': 0.87, 'social': 0.65, 'governance': 0.12}
-# TODO: Add training and inference pipeline
 
 import csv
 from collections import defaultdict
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+def evaluate_esg_classifier(true_labels: list, pred_scores: list, threshold: float = 0.5):
+    """
+    Evaluates ESG classifier predictions using accuracy, precision, recall, and F1-score.
+    true_labels: List of dicts with 'environment', 'social', 'governance' (0/1)
+    pred_scores: List of dicts with 'environment', 'social', 'governance' (float scores)
+    threshold: Score threshold to convert probabilities to binary predictions
+    Returns: dict of metrics per label
+    """
+    y_true = {label: [] for label in ESG_LABELS}
+    y_pred = {label: [] for label in ESG_LABELS}
+    for t, p in zip(true_labels, pred_scores):
+        for label in ESG_LABELS:
+            y_true[label].append(t[label])
+            y_pred[label].append(int(p[label] >= threshold))
+    metrics = {}
+    for label in ESG_LABELS:
+        metrics[label] = {
+            "accuracy": accuracy_score(y_true[label], y_pred[label]),
+            "precision": precision_score(y_true[label], y_pred[label], zero_division=0),
+            "recall": recall_score(y_true[label], y_pred[label], zero_division=0),
+            "f1": f1_score(y_true[label], y_pred[label], zero_division=0)
+        }
+    return metrics
 
 def aggregate_esg_scores(articles: List[Dict]) -> Dict[str, Dict[str, float]]:
     """

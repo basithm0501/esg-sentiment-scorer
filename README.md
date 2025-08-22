@@ -61,17 +61,37 @@
 esg-sentiment-scorer/
 ├── src/
 │   ├── scraping/          # News scraping modules
-│   ├── nlp/              # NLP and sentiment analysis
-│   ├── scoring/          # ESG scoring algorithms
-│   ├── api/              # FastAPI backend
-│   └── dashboard/        # Streamlit frontend
+│   │   ├── news_scraper.py
+│   │   └── multilingual_scraper.py
+│   ├── nlp/               # NLP and sentiment analysis
+│   │   └── sentiment_analyzer.py
+│   ├── scoring/           # ESG scoring algorithms
+│   ├── api/               # (Optional) API backend
+│   │   └── main.py
+│   ├── dashboard/         # Streamlit dashboard
+│   │   └── esg_dashboard.py
+│   └── __init__.py
 ├── data/
-│   ├── raw/             # Raw scraped data
-│   ├── processed/       # Cleaned and processed data
-│   └── vectors/         # Vector embeddings
-├── config/              # Configuration files
-├── tests/               # Unit and integration tests [TODO]
-└── docs/                # Documentation
+│   ├── raw/               # Raw scraped data
+│   ├── processed/         # Cleaned and processed data
+│   │   ├── company_esg_scores.csv
+│   │   └── company_esg_risk_scores.csv
+│   └── vectors/           # Vector embeddings
+├── models/                # Trained models and checkpoints
+├── config/
+│   ├── settings.py        # Configuration and sources
+│   └── companies.py       # Company list
+├── tests/                 # Unit and integration tests [TODO]
+├── docs/                  # Documentation
+│   └── USAGE.md
+├── notebooks/
+│   └── esg_analysis_demo.ipynb
+├── Dockerfile
+├── docker-compose.yml
+├── Makefile
+├── README.md
+├── requirements.txt
+└── LICENSE
 ```
 
 

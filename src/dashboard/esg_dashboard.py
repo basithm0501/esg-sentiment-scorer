@@ -49,4 +49,21 @@ heatmap_region = filtered_df.pivot_table(index="company", columns="region", valu
 fig_region = px.imshow(heatmap_region, color_continuous_scale="RdYlGn_r", aspect="auto", labels=dict(color="Risk (0=Low, 100=High)"))
 st.plotly_chart(fig_region, use_container_width=True)
 
+# Load ESG scores for more details
+esg_scores_path = "data/processed/company_esg_scores.csv"
+esg_scores_df = pd.read_csv(esg_scores_path)
+
+# Merge risk and score data for richer dashboard
+merged_df = pd.merge(risk_df, esg_scores_df, on="company", suffixes=("_risk", "_score"))
+
+st.subheader("ESG Scores and Risk Table")
+st.dataframe(merged_df)
+
+# Optionally, update heatmaps to show both risk and score
+# Example: Heatmap of environmental_score by sector
+st.subheader("Environmental Score Heatmap by Sector")
+heatmap_env_sector = merged_df.pivot_table(index="company", columns="sector", values="environment_score")
+fig_env_sector = px.imshow(heatmap_env_sector, color_continuous_scale="YlGn", aspect="auto", labels=dict(color="Env Score (0=Low, 1=High)"))
+st.plotly_chart(fig_env_sector, use_container_width=True)
+
 st.dataframe(filtered_df)
